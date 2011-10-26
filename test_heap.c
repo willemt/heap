@@ -8,19 +8,10 @@
 
 #include "heap.h"
 
-static unsigned int __uint_hash(
-    const void *e1
-)
-{
-    const long i1 = (unsigned long) e1;
-
-    assert(i1 >= 0);
-    return i1;
-}
-
 static int __uint_compare(
     const void *e1,
-    const void *e2
+    const void *e2,
+    const void *udata
 )
 {
     const int *i1 = e1;
@@ -36,7 +27,7 @@ void TestHeap_new(
 {
     heap_t *hp;
 
-    hp = heap_new(__uint_compare);
+    hp = heap_new(NULL, NULL);
 
     CuAssertTrue(tc, 0 == heap_count(hp));
 }
@@ -49,7 +40,7 @@ void TestHeap_offer(
 
     int val = 10;
 
-    hp = heap_new(__uint_compare);
+    hp = heap_new(__uint_compare, NULL);
 
     heap_offer(hp, &val);
     CuAssertTrue(tc, 1 == heap_count(hp));
@@ -65,7 +56,7 @@ void TestHeap_poll(
 
     int *res;
 
-    hp = heap_new(__uint_compare);
+    hp = heap_new(__uint_compare, NULL);
 
     heap_offer(hp, &val);
     res = heap_poll(hp);
@@ -83,7 +74,7 @@ void TestHeap_poll_best(
     int vals[10] = { 9, 2, 5, 7, 4, 6, 3, 8, 1 };
     int ii;
 
-    hp = heap_new(__uint_compare);
+    hp = heap_new(__uint_compare, NULL);
 
     for (ii = 0; ii < 9; ii++)
     {

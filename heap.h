@@ -4,9 +4,12 @@ typedef struct
     void **array;
     int arraySize;
     int count;
+    /**  user data */
+    void *udata;
     int (
     *cmp
     )   (
+    const void *,
     const void *,
     const void *
     );
@@ -14,7 +17,9 @@ typedef struct
 
 heap_t *heap_new(
     int (*cmp) (const void *,
-                const void *)
+                const void *,
+                const void *udata),
+    const void *udata
 );
 
 void heap_free(

@@ -47,13 +47,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * @param cmp : a function pointer used to determine the priority of the item */
 heap_t *heap_new(
     int (*cmp) (const void *,
-                const void *)
+                const void *,
+                const void *udata),
+    const void *udata
 )
 {
     heap_t *hp;
 
     hp = malloc(sizeof(heap_t));
     hp->cmp = cmp;
+    hp->udata = udata;
     hp->arraySize = INITIAL_CAPACITY;
     hp->array = malloc(sizeof(void *) * hp->arraySize);
     hp->count = 0;
@@ -120,7 +123,7 @@ static void __pushup(
             return;
 
         parent = (idx - 1) / 2;
-        compare = hp->cmp(hp->array[idx], hp->array[parent]);
+        compare = hp->cmp(hp->array[idx], hp->array[parent], hp->udata);
 
         /* we are smaller than the parent */
         if (compare < 0)
@@ -164,7 +167,7 @@ static void __pushdown(
         else
         {
             /* find biggest child */
-            compare = hp->cmp(hp->array[childl], hp->array[childr]);
+            compare = hp->cmp(hp->array[childl], hp->array[childr], hp->udata);
 
             if (compare < 0)
             {
@@ -178,7 +181,7 @@ static void __pushdown(
 
         assert(child != -1);
 
-        compare = hp->cmp(hp->array[idx], hp->array[child]);
+        compare = hp->cmp(hp->array[idx], hp->array[child], hp->udata);
 
         /* idx is smaller than child */
         if (compare < 0)
