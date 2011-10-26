@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "heap.h"
 
 #define DEBUG 0
-#define INITIAL_CAPACITY 16
+#define INITIAL_CAPACITY 13
 
 /*-------------------------------------------------------------- INIT METHODS */
 
