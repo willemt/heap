@@ -5,7 +5,7 @@ typedef struct
     int arraySize;
     int count;
     /**  user data */
-    void *udata;
+    const void *udata;
     int (
     *cmp
     )   (
