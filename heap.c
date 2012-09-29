@@ -146,13 +146,11 @@ static void __pushdown(
 {
     while (1)
     {
-        int childl = idx * 2 + 1;
+        int childl, childr, child, compare;
 
-        int childr = idx * 2 + 2;
-
-        int child = -1;
-
-        int compare;
+        childl = idx * 2 + 1;
+        childr = idx * 2 + 2;
+        child = -1;
 
         assert(idx != hp->count);
 
