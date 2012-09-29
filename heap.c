@@ -44,7 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * Init a heap and return it.
  * We malloc space for it.
  *
- * @param cmp : a function pointer used to determine the priority of the item */
+ * @param cmp : a function pointer used to determine the priority of the item
+ * @param udata : udata passed through to compare callback */
 heap_t *heap_new(
     int (*cmp) (const void *,
                 const void *,
@@ -63,6 +64,8 @@ heap_t *heap_new(
     return hp;
 }
 
+/**
+ * Free memory held by heap */
 void heap_free(
     heap_t * hp
 )
@@ -197,7 +200,9 @@ static void __pushdown(
     }
 }
 
-/** Add this value to the heap. */
+/**
+ * Add this value to the heap.
+ * @param item : the item to be added to the heap */
 void heap_offer(
     heap_t * hp,
     void *item
@@ -229,7 +234,9 @@ static void DEBUG_check_validity(
 #endif
 }
 
-/** Remove the top value from this heap. */
+/**
+ * Remove the top value from this heap.
+ * @return top item of the heap */
 void *heap_poll(
     heap_t * hp
 )
@@ -265,6 +272,8 @@ void *heap_poll(
     return item;
 }
 
+/**
+ * @return the item on the top of the heap */
 void *heap_peek(
     heap_t * hp
 )
@@ -278,10 +287,20 @@ void *heap_peek(
     return hp->array[0];
 }
 
+/**
+ * Clear all items from the heap */
+void heap_clear(
+    heap_t * hp
+)
+{
+    hp->count = 0;
+}
+
 /*------------------------------------------------------------ STATUS METHODS */
 
 /**
- * How many elements are there in this heap? */
+ * How many items are there in this heap?
+ * @return number of items in heap */
 int heap_count(
     heap_t * hp
 )
