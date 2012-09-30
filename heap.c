@@ -311,7 +311,8 @@ static int __item_get_idx(heap_t * hp, const void *item)
 }
 
 /**
- * The heap will remove this item */
+ * The heap will remove this item
+ * @return item to be removed */
 void *heap_remove_item(heap_t * hp, const void *item)
 {
     void *ret_item;
@@ -336,6 +337,19 @@ void *heap_remove_item(heap_t * hp, const void *item)
     __pushup(hp, idx);
 
     return ret_item;
+}
+
+/**
+ * The heap will remove this item
+ * @return 1 if the heap contains this item, 0 otherwise */
+int heap_contains_item(heap_t * hp, const void *item)
+{
+    int idx;
+
+    /* find the index */
+    idx = __item_get_idx(hp, item);
+
+    return (idx != -1);
 }
 
 /*------------------------------------------------------------ STATUS METHODS */
