@@ -93,3 +93,28 @@ void TestHeap_poll_best(
 
     heap_free(hp);
 }
+
+void TestHeap_remove_item(
+    CuTest * tc
+)
+{
+    heap_t *hp;
+
+    int vals[10] = { 9, 2, 5, 7, 4, 6, 3, 8, 1 };
+    int ii;
+
+    hp = heap_new(__uint_compare, NULL);
+
+    for (ii = 0; ii < 9; ii++)
+    {
+        heap_offer(hp, &vals[ii]);
+    }
+
+    int *item;
+
+    item = heap_remove_item(hp, &vals[0]);
+
+    CuAssertTrue(tc, *item == 9);
+
+    heap_free(hp);
+}
