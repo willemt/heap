@@ -11,7 +11,7 @@
 static int __uint_compare(
     const void *e1,
     const void *e2,
-    const void *udata
+    const void *udata __attribute__((__unused__))
 )
 {
     const int *i1 = e1;
@@ -137,6 +137,73 @@ void TestHeap_contains_item(
 
     CuAssertTrue(tc, 1 == heap_contains_item(hp, &vals[2]));
     CuAssertTrue(tc, 1 == heap_contains_item(hp, &vals[1]));
+    CuAssertTrue(tc, 1 == heap_contains_item(hp, &vals[0]));
+
+    heap_free(hp);
+}
+
+void TestHeap_clearRemovesAllItems(
+    CuTest * tc
+)
+{
+    heap_t *hp;
+
+    int vals[10] = { 9, 2, 5, 7, 4, 6, 3, 8, 1 };
+    int ii;
+
+    hp = heap_new(__uint_compare, NULL);
+
+    for (ii = 0; ii < 9; ii++)
+    {
+        heap_offer(hp, &vals[ii]);
+    }
+
+    heap_clear(hp);
+
+    CuAssertTrue(tc, 0 == heap_contains_item(hp, &vals[2]));
+    CuAssertTrue(tc, 0 == heap_contains_item(hp, &vals[1]));
+    CuAssertTrue(tc, 0 == heap_contains_item(hp, &vals[0]));
+
+    heap_free(hp);
+}
+
+void TestHeap_peekGetsBest(
+    CuTest * tc
+)
+{
+    heap_t *hp;
+
+    int vals[10] = { 9, 2, 5, 7, 4, 6, 3, 8, 1 };
+    int ii;
+
+    hp = heap_new(__uint_compare, NULL);
+
+    for (ii = 0; ii < 9; ii++)
+    {
+        heap_offer(hp, &vals[ii]);
+    }
+
+    CuAssertTrue(tc, 1 == *(int*)heap_peek(hp));
+
+    heap_free(hp);
+}
+
+void TestHeap_doubling_capacity_retains_items(
+    CuTest * tc
+)
+{
+    heap_t *hp;
+
+    int vals[15] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+    int ii;
+
+    hp = heap_new(__uint_compare, NULL);
+
+    for (ii = 0; ii < 15; ii++)
+    {
+        heap_offer(hp, &vals[ii]);
+    }
+
     CuAssertTrue(tc, 1 == heap_contains_item(hp, &vals[0]));
 
     heap_free(hp);

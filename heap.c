@@ -52,8 +52,8 @@ static int __child_right(const int idx)
 
 static int __parent(const int idx)
 {
-assert(idx != 0);
-return (idx - 1) / 2;
+    assert(idx != 0);
+    return (idx - 1) / 2;
 }
 
 
@@ -226,15 +226,15 @@ void heap_offer(heap_t * hp, void *item)
     hp->count++;
 }
 
+#if DEBUG
 static void DEBUG_check_validity(heap_t * hp)
 {
-#if DEBUG
     int ii;
 
     for (ii = 0; ii < hp->count; ii++)
 	assert(hp->array[ii]);
-#endif
 }
+#endif
 
 /**
  * Remove the top value from this heap.
@@ -251,7 +251,9 @@ void *heap_poll(heap_t * hp)
     if (0 == heap_count(hp))
 	return NULL;
 
+#if DEBUG
     DEBUG_check_validity(hp);
+#endif
 
     item = hp->array[0];
 
@@ -259,7 +261,9 @@ void *heap_poll(heap_t * hp)
     __swap(hp, 0, hp->count - 1);
     hp->count--;
 
+#if DEBUG
     DEBUG_check_validity(hp);
+#endif
 
     if (hp->count > 0)
     {
@@ -267,7 +271,9 @@ void *heap_poll(heap_t * hp)
 	__pushdown(hp, 0);
     }
 
+#if DEBUG
     DEBUG_check_validity(hp);
+#endif
 
     return item;
 }
@@ -286,7 +292,8 @@ void *heap_peek(heap_t * hp)
 }
 
 /**
- * Clear all items from the heap */
+ * Clear all items from the heap.
+ * Only use if item memory is managed outside of the heap. */
 void heap_clear(heap_t * hp)
 {
     hp->count = 0;

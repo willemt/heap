@@ -23,3 +23,9 @@ void *heap_peek(heap_t * hp);
 int heap_count(heap_t * hp);
 
 void *heap_remove_item(heap_t * hp, const void *item);
+
+int heap_contains_item(heap_t * hp, const void *item);
+
+void *heap_peek(heap_t * hp);
+
+void heap_clear(heap_t * hp);
