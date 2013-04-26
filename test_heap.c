@@ -160,6 +160,7 @@ void TestHeap_clearRemovesAllItems(
 
     heap_clear(hp);
 
+    CuAssertTrue(tc, 0 == heap_count(hp));
     CuAssertTrue(tc, 0 == heap_contains_item(hp, &vals[2]));
     CuAssertTrue(tc, 0 == heap_contains_item(hp, &vals[1]));
     CuAssertTrue(tc, 0 == heap_contains_item(hp, &vals[0]));

@@ -38,8 +38,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define DEBUG 0
 #define INITIAL_CAPACITY 13
 
-/*-------------------------------------------------------------- INIT METHODS */
-
 static int __child_left(const int idx)
 {
     return idx * 2 + 1;
@@ -56,13 +54,14 @@ static int __parent(const int idx)
     return (idx - 1) / 2;
 }
 
+/*-------------------------------------------------------------- INIT METHODS */
 
 /**
- * Init a heap and return it.
- * We malloc space for it.
+ * Init a heap and return it. Malloc space for it.
  *
  * @param cmp : a function pointer used to determine the priority of the item
- * @param udata : udata passed through to compare callback */
+ * @param udata : udata passed through to compare callback
+ * @return initialised heap */
 heap_t *heap_new(int (*cmp) (const void *,
 			     const void *,
 			     const void *udata), const void *udata)
@@ -279,7 +278,7 @@ void *heap_poll(heap_t * hp)
 }
 
 /**
- * @return the item on the top of the heap */
+ * @return item on the top of the heap */
 void *heap_peek(heap_t * hp)
 {
     if (!hp)
@@ -299,6 +298,9 @@ void heap_clear(heap_t * hp)
     hp->count = 0;
 }
 
+
+/**
+ * @return item's index on the heap's array */
 static int __item_get_idx(heap_t * hp, const void *item)
 {
     int compare, idx;
@@ -348,6 +350,7 @@ void *heap_remove_item(heap_t * hp, const void *item)
 
 /**
  * The heap will remove this item
+ * @param item : item to be removed
  * @return 1 if the heap contains this item, 0 otherwise */
 int heap_contains_item(heap_t * hp, const void *item)
 {
