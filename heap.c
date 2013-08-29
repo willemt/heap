@@ -54,13 +54,11 @@ static int __parent(const int idx)
     return (idx - 1) / 2;
 }
 
-/*-------------------------------------------------------------- INIT METHODS */
-
 /**
  * Init a heap and return it. Malloc space for it.
  *
- * @param cmp : a function pointer used to determine the priority of the item
- * @param udata : udata passed through to compare callback
+ * @param cmp Callback used to determine the priority of the item
+ * @param udata Udata passed through to compare callback
  * @return initialised heap */
 heap_t *heap_new(int (*cmp) (const void *,
 			     const void *,
@@ -110,12 +108,11 @@ static void __ensurecapacity(heap_t * hp)
     hp->array = array_n;
 }
 
-/*------------------------------------------------------------ IN/OUT METHODS */
-
 static void __swap(heap_t * hp, const int i1, const int i2)
 {
-    void *tmp = hp->array[i1];
-
+    void *tmp;
+    
+    tmp = hp->array[i1];
     hp->array[i1] = hp->array[i2];
     hp->array[i2] = tmp;
 }
@@ -155,11 +152,11 @@ static void __pushdown(heap_t * hp, int idx)
     {
 	int childl, childr, child, compare;
 
+	assert(idx != hp->count);
+
 	childl = __child_left(idx);
 	childr = __child_right(idx);
 	child = -1;
-
-	assert(idx != hp->count);
 
 	if (childr >= hp->count)
 	{
@@ -207,7 +204,7 @@ static void __pushdown(heap_t * hp, int idx)
 
 /**
  * Add this value to the heap.
- * @param item : the item to be added to the heap */
+ * @param item Item to be added to the heap */
 void heap_offer(heap_t * hp, void *item)
 {
     assert(hp);
@@ -298,7 +295,6 @@ void heap_clear(heap_t * hp)
     hp->count = 0;
 }
 
-
 /**
  * @return item's index on the heap's array */
 static int __item_get_idx(heap_t * hp, const void *item)
@@ -321,6 +317,7 @@ static int __item_get_idx(heap_t * hp, const void *item)
 
 /**
  * The heap will remove this item
+ * @param item Item that is to be removed
  * @return item to be removed */
 void *heap_remove_item(heap_t * hp, const void *item)
 {
@@ -350,7 +347,7 @@ void *heap_remove_item(heap_t * hp, const void *item)
 
 /**
  * The heap will remove this item
- * @param item : item to be removed
+ * @param item Item to be removed
  * @return 1 if the heap contains this item, 0 otherwise */
 int heap_contains_item(heap_t * hp, const void *item)
 {
@@ -361,8 +358,6 @@ int heap_contains_item(heap_t * hp, const void *item)
 
     return (idx != -1);
 }
-
-/*------------------------------------------------------------ STATUS METHODS */
 
 /**
  * How many items are there in this heap?
