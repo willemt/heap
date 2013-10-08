@@ -64,60 +64,60 @@ heap_t *heap_new(int (*cmp) (const void *,
 			     const void *,
 			     const void *udata), const void *udata)
 {
-    heap_t *hp;
+    heap_t *h;
 
-    hp = malloc(sizeof(heap_t));
-    hp->cmp = cmp;
-    hp->udata = udata;
-    hp->arraySize = INITIAL_CAPACITY;
-    hp->array = malloc(sizeof(void *) * hp->arraySize);
-    hp->count = 0;
-    return hp;
+    h = malloc(sizeof(heap_t));
+    h->cmp = cmp;
+    h->udata = udata;
+    h->arraySize = INITIAL_CAPACITY;
+    h->array = malloc(sizeof(void *) * h->arraySize);
+    h->count = 0;
+    return h;
 }
 
 /**
  * Free memory held by heap */
-void heap_free(heap_t * hp)
+void heap_free(heap_t * h)
 {
-    free(hp->array);
-    free(hp);
+    free(h->array);
+    free(h);
 }
 
-static void __ensurecapacity(heap_t * hp)
+static void __ensurecapacity(heap_t * h)
 {
     int ii;
 
     void **array_n;
 
-    if (hp->count < hp->arraySize)
+    if (h->count < h->arraySize)
 	return;
 
     /* double capacity */
-    hp->arraySize *= 2;
-    array_n = malloc(sizeof(void *) * hp->arraySize);
+    h->arraySize *= 2;
+    array_n = malloc(sizeof(void *) * h->arraySize);
 
     /* copy old data across to new array */
-    for (ii = 0; ii < hp->count; ii++)
+    for (ii = 0; ii < h->count; ii++)
     {
-	array_n[ii] = hp->array[ii];
+	array_n[ii] = h->array[ii];
 	assert(array_n[ii]);
     }
 
     /* swap arrays */
-    free(hp->array);
-    hp->array = array_n;
+    free(h->array);
+    h->array = array_n;
 }
 
-static void __swap(heap_t * hp, const int i1, const int i2)
+static void __swap(heap_t * h, const int i1, const int i2)
 {
     void *tmp;
     
-    tmp = hp->array[i1];
-    hp->array[i1] = hp->array[i2];
-    hp->array[i2] = tmp;
+    tmp = h->array[i1];
+    h->array[i1] = h->array[i2];
+    h->array[i2] = tmp;
 }
 
-static int __pushup(heap_t * hp, int idx)
+static int __pushup(heap_t * h, int idx)
 {
     while (1)
     {
@@ -128,7 +128,7 @@ static int __pushup(heap_t * hp, int idx)
 	    return idx;
 
 	parent = __parent(idx);
-	compare = hp->cmp(hp->array[idx], hp->array[parent], hp->udata);
+	compare = h->cmp(h->array[idx], h->array[parent], h->udata);
 
 	/* we are smaller than the parent */
 	if (compare < 0)
@@ -137,7 +137,7 @@ static int __pushup(heap_t * hp, int idx)
 	}
 	else
 	{
-	    __swap(hp, idx, parent);
+	    __swap(h, idx, parent);
 	}
 
 	idx = parent;
@@ -146,22 +146,22 @@ static int __pushup(heap_t * hp, int idx)
     return idx;
 }
 
-static void __pushdown(heap_t * hp, int idx)
+static void __pushdown(heap_t * h, int idx)
 {
     while (1)
     {
 	int childl, childr, child, compare;
 
-	assert(idx != hp->count);
+	assert(idx != h->count);
 
 	childl = __child_left(idx);
 	childr = __child_right(idx);
 	child = -1;
 
-	if (childr >= hp->count)
+	if (childr >= h->count)
 	{
 	    /* can't pushdown any further */
-	    if (childl >= hp->count)
+	    if (childl >= h->count)
 		return;
 
 	    child = childl;
@@ -170,7 +170,7 @@ static void __pushdown(heap_t * hp, int idx)
 	{
 	    /* find biggest child */
 	    compare =
-		hp->cmp(hp->array[childl], hp->array[childr], hp->udata);
+		h->cmp(h->array[childl], h->array[childr], h->udata);
 
 	    if (compare < 0)
 	    {
@@ -184,14 +184,14 @@ static void __pushdown(heap_t * hp, int idx)
 
 	assert(child != -1);
 
-	compare = hp->cmp(hp->array[idx], hp->array[child], hp->udata);
+	compare = h->cmp(h->array[idx], h->array[child], h->udata);
 
 	/* idx is smaller than child */
 	if (compare < 0)
 	{
-	    assert(hp->array[idx]);
-	    assert(hp->array[child]);
-	    __swap(hp, idx, child);
+	    assert(h->array[idx]);
+	    assert(h->array[child]);
+	    __swap(h, idx, child);
 	    idx = child;
 	    /* bigger than the biggest child, we stop, we win */
 	}
@@ -205,70 +205,70 @@ static void __pushdown(heap_t * hp, int idx)
 /**
  * Add this value to the heap.
  * @param item Item to be added to the heap */
-void heap_offer(heap_t * hp, void *item)
+void heap_offer(heap_t * h, void *item)
 {
-    assert(hp);
+    assert(h);
     assert(item);
     if (!item)
 	return;
 
-    __ensurecapacity(hp);
+    __ensurecapacity(h);
 
-    hp->array[hp->count] = item;
+    h->array[h->count] = item;
 
     /* ensure heap properties */
-    __pushup(hp, hp->count);
+    __pushup(h, h->count);
 
-    hp->count++;
+    h->count++;
 }
 
 #if DEBUG
-static void DEBUG_check_validity(heap_t * hp)
+static void DEBUG_check_validity(heap_t * h)
 {
     int ii;
 
-    for (ii = 0; ii < hp->count; ii++)
-	assert(hp->array[ii]);
+    for (ii = 0; ii < h->count; ii++)
+	assert(h->array[ii]);
 }
 #endif
 
 /**
  * Remove the top value from this heap.
  * @return top item of the heap */
-void *heap_poll(heap_t * hp)
+void *heap_poll(heap_t * h)
 {
     void *item;
 
-    assert(hp);
+    assert(h);
 
-    if (!hp)
+    if (!h)
 	return NULL;
 
-    if (0 == heap_count(hp))
+    if (0 == heap_count(h))
 	return NULL;
 
 #if DEBUG
-    DEBUG_check_validity(hp);
+    DEBUG_check_validity(h);
 #endif
 
-    item = hp->array[0];
+    item = h->array[0];
 
-    hp->array[0] = NULL;
-    __swap(hp, 0, hp->count - 1);
-    hp->count--;
+    h->array[0] = NULL;
+    __swap(h, 0, h->count - 1);
+    h->count--;
 
 #if DEBUG
-    DEBUG_check_validity(hp);
+    DEBUG_check_validity(h);
 #endif
 
-    if (hp->count > 0)
+    if (h->count > 0)
     {
-	assert(hp->array[0]);
-	__pushdown(hp, 0);
+	assert(h->array[0]);
+	__pushdown(h, 0);
     }
 
 #if DEBUG
-    DEBUG_check_validity(hp);
+    DEBUG_check_validity(h);
 #endif
 
     return item;
@@ -276,34 +276,34 @@ void *heap_poll(heap_t * hp)
 
 /**
  * @return item on the top of the heap */
-void *heap_peek(heap_t * hp)
+void *heap_peek(heap_t * h)
 {
-    if (!hp)
+    if (!h)
 	return NULL;
 
-    if (0 == heap_count(hp))
+    if (0 == heap_count(h))
 	return NULL;
 
-    return hp->array[0];
+    return h->array[0];
 }
 
 /**
  * Clear all items from the heap.
  * Only use if item memory is managed outside of the heap. */
-void heap_clear(heap_t * hp)
+void heap_clear(heap_t * h)
 {
-    hp->count = 0;
+    h->count = 0;
 }
 
 /**
  * @return item's index on the heap's array */
-static int __item_get_idx(heap_t * hp, const void *item)
+static int __item_get_idx(heap_t * h, const void *item)
 {
     int compare, idx;
 
-    for (idx = 0; idx < hp->count; idx++)
+    for (idx = 0; idx < h->count; idx++)
     {
-	compare = hp->cmp(hp->array[idx], item, hp->udata);
+	compare = h->cmp(h->array[idx], item, h->udata);
 
 	/* we have found it */
 	if (compare == 0)
@@ -319,28 +319,28 @@ static int __item_get_idx(heap_t * hp, const void *item)
  * The heap will remove this item
  * @param item Item that is to be removed
  * @return item to be removed */
-void *heap_remove_item(heap_t * hp, const void *item)
+void *heap_remove_item(heap_t * h, const void *item)
 {
     void *ret_item;
     int idx;
 
     /* find the index */
-    idx = __item_get_idx(hp, item);
+    idx = __item_get_idx(h, item);
 
     /* we didn't find it */
     if (idx == -1)
 	return NULL;
 
     /* swap the item we found with the last item on the heap */
-    ret_item = hp->array[idx];
-    hp->array[idx] = hp->array[hp->count - 1];
-    hp->array[hp->count - 1] = NULL;
+    ret_item = h->array[idx];
+    h->array[idx] = h->array[h->count - 1];
+    h->array[h->count - 1] = NULL;
 
     /* decrement counter */
-    hp->count -= 1;
+    h->count -= 1;
 
     /* ensure heap property */
-    __pushup(hp, idx);
+    __pushup(h, idx);
 
     return ret_item;
 }
@@ -349,12 +349,12 @@ void *heap_remove_item(heap_t * hp, const void *item)
  * The heap will remove this item
  * @param item Item to be removed
  * @return 1 if the heap contains this item, 0 otherwise */
-int heap_contains_item(heap_t * hp, const void *item)
+int heap_contains_item(heap_t * h, const void *item)
 {
     int idx;
 
     /* find the index */
-    idx = __item_get_idx(hp, item);
+    idx = __item_get_idx(h, item);
 
     return (idx != -1);
 }
@@ -362,9 +362,9 @@ int heap_contains_item(heap_t * hp, const void *item)
 /**
  * How many items are there in this heap?
  * @return number of items in heap */
-int heap_count(heap_t * hp)
+int heap_count(heap_t * h)
 {
-    return hp->count;
+    return h->count;
 }
 
 /*--------------------------------------------------------------79-characters-*/
