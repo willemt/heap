@@ -7,15 +7,15 @@ CCFLAGS = -g -O2 -Wall -Werror -W -fno-omit-frame-pointer -fno-common -fsigned-c
 all: tests
 
 main.c:
-	sh make-tests.sh > main.c
+	sh tests/make-tests.sh tests/test_*.c > main.c
 
-tests: main.c heap.o test_heap.c CuTest.c main.c
-	$(CC) $(CCFLAGS) -o $@ $^
+tests: main.c heap.o tests/test_heap.c tests/CuTest.c main.c
+	$(CC) $(CCFLAGS) -I. -Itests -o $@ $^
 	./tests
-	gcov main.c test_heap.c heap.c
+	gcov main.c tests/test_heap.c heap.c
 
 heap.o: heap.c
 	$(CC) $(CCFLAGS) -c -o $@ $^
 
 clean:
-	rm -f main.c heap.o tests $(GCOV_OUTPUT)
+	rm -f main.c heap.o $(GCOV_OUTPUT)

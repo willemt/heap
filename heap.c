@@ -54,12 +54,6 @@ static int __parent(const int idx)
     return (idx - 1) / 2;
 }
 
-/**
- * Init a heap and return it. Malloc space for it.
- *
- * @param cmp Callback used to determine the priority of the item
- * @param udata Udata passed through to compare callback
- * @return initialised heap */
 heap_t *heap_new(int (*cmp) (const void *,
 			     const void *,
 			     const void *udata), const void *udata)
@@ -75,8 +69,6 @@ heap_t *heap_new(int (*cmp) (const void *,
     return h;
 }
 
-/**
- * Free memory held by heap */
 void heap_free(heap_t * h)
 {
     free(h->array);
@@ -202,9 +194,6 @@ static void __pushdown(heap_t * h, int idx)
     }
 }
 
-/**
- * Add this value to the heap.
- * @param item Item to be added to the heap */
 void heap_offer(heap_t * h, void *item)
 {
     assert(h);
@@ -232,9 +221,6 @@ static void DEBUG_check_validity(heap_t * h)
 }
 #endif
 
-/**
- * Remove the top value from this heap.
- * @return top item of the heap */
 void *heap_poll(heap_t * h)
 {
     void *item;
@@ -274,8 +260,6 @@ void *heap_poll(heap_t * h)
     return item;
 }
 
-/**
- * @return item on the top of the heap */
 void *heap_peek(heap_t * h)
 {
     if (!h)
@@ -287,9 +271,6 @@ void *heap_peek(heap_t * h)
     return h->array[0];
 }
 
-/**
- * Clear all items from the heap.
- * Only use if item memory is managed outside of the heap. */
 void heap_clear(heap_t * h)
 {
     h->count = 0;
@@ -315,10 +296,6 @@ static int __item_get_idx(heap_t * h, const void *item)
     return -1;
 }
 
-/**
- * The heap will remove this item
- * @param item Item that is to be removed
- * @return item to be removed */
 void *heap_remove_item(heap_t * h, const void *item)
 {
     void *ret_item;
@@ -345,10 +322,6 @@ void *heap_remove_item(heap_t * h, const void *item)
     return ret_item;
 }
 
-/**
- * The heap will remove this item
- * @param item Item to be removed
- * @return 1 if the heap contains this item, 0 otherwise */
 int heap_contains_item(heap_t * h, const void *item)
 {
     int idx;
@@ -359,9 +332,6 @@ int heap_contains_item(heap_t * h, const void *item)
     return (idx != -1);
 }
 
-/**
- * How many items are there in this heap?
- * @return number of items in heap */
 int heap_count(heap_t * h)
 {
     return h->count;
