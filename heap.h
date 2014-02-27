@@ -1,3 +1,5 @@
+#ifndef HEAP_H
+#define HEAP_H
 
 typedef struct {
     void **array;
@@ -58,3 +60,4 @@ void *heap_remove_item(heap_t * hp, const void *item);
  * @return 1 if the heap contains this item, 0 otherwise */
 int heap_contains_item(heap_t * hp, const void *item);
 
+#endif /* HEAP_H */
