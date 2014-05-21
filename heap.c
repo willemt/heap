@@ -1,31 +1,3 @@
-/*
- 
-Copyright (c) 2011, Willem-Hendrik Thiart
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * The names of its contributors may not be used to endorse or promote
-      products derived from this software without specific prior written
-      permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL WILLEM-HENDRIK THIART BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,13 +30,11 @@ heap_t *heap_new(int (*cmp) (const void *,
 			     const void *,
 			     const void *udata), const void *udata)
 {
-    heap_t *h;
-
-    h = malloc(sizeof(heap_t));
+    heap_t *h = malloc(sizeof(heap_t));
     h->cmp = cmp;
     h->udata = udata;
-    h->arraySize = INITIAL_CAPACITY;
-    h->array = malloc(sizeof(void *) * h->arraySize);
+    h->size = INITIAL_CAPACITY;
+    h->array = malloc(sizeof(void *) * h->size);
     h->count = 0;
     return h;
 }
@@ -77,53 +47,43 @@ void heap_free(heap_t * h)
 
 static void __ensurecapacity(heap_t * h)
 {
-    int ii;
 
-    void **array_n;
-
-    if (h->count < h->arraySize)
+    if (h->count < h->size)
 	return;
 
-    /* double capacity */
-    h->arraySize *= 2;
-    array_n = malloc(sizeof(void *) * h->arraySize);
+    h->size *= 2;
+
+    void **new_array = malloc(sizeof(void *) * h->size);
 
     /* copy old data across to new array */
-    for (ii = 0; ii < h->count; ii++)
+    unsigned int i;
+    for (i = 0; i < h->count; i++)
     {
-	array_n[ii] = h->array[ii];
-	assert(array_n[ii]);
+	new_array[i] = h->array[i];
+	assert(new_array[i]);
     }
 
     /* swap arrays */
     free(h->array);
-    h->array = array_n;
+    h->array = new_array;
 }
 
 static void __swap(heap_t * h, const int i1, const int i2)
 {
-    void *tmp;
-    
-    tmp = h->array[i1];
+    void *tmp = h->array[i1];
     h->array[i1] = h->array[i2];
     h->array[i2] = tmp;
 }
 
-static int __pushup(heap_t * h, int idx)
+static int __pushup(heap_t * h, unsigned int idx)
 {
-    while (1)
+    /* 0 is the root node */
+    while (0 != idx)
     {
-	int parent, compare;
-
-	/* we are now the root node */
-	if (0 == idx)
-	    return idx;
-
-	parent = __parent(idx);
-	compare = h->cmp(h->array[idx], h->array[parent], h->udata);
+	int parent = __parent(idx);
 
 	/* we are smaller than the parent */
-	if (compare < 0)
+	if (h->cmp(h->array[idx], h->array[parent], h->udata) < 0)
 	{
 	    return -1;
 	}
@@ -138,17 +98,16 @@ static int __pushup(heap_t * h, int idx)
     return idx;
 }
 
-static void __pushdown(heap_t * h, int idx)
+static void __pushdown(heap_t * h, unsigned int idx)
 {
     while (1)
     {
-	int childl, childr, child, compare;
+	unsigned int childl, childr, child;
 
 	assert(idx != h->count);
 
 	childl = __child_left(idx);
 	childr = __child_right(idx);
-	child = -1;
 
 	if (childr >= h->count)
 	{
@@ -158,28 +117,18 @@ static void __pushdown(heap_t * h, int idx)
 
 	    child = childl;
 	}
-	else
-	{
-	    /* find biggest child */
-	    compare =
-		h->cmp(h->array[childl], h->array[childr], h->udata);
-
-	    if (compare < 0)
-	    {
-		child = childr;
-	    }
-	    else
-	    {
-		child = childl;
-	    }
-	}
-
-	assert(child != -1);
-
-	compare = h->cmp(h->array[idx], h->array[child], h->udata);
+        /* find biggest child */
+	else if (h->cmp(h->array[childl], h->array[childr], h->udata) < 0)
+        {
+            child = childr;
+        }
+        else
+        {
+            child = childl;
+        }
 
 	/* idx is smaller than child */
-	if (compare < 0)
+	if (h->cmp(h->array[idx], h->array[child], h->udata) < 0)
 	{
 	    assert(h->array[idx]);
 	    assert(h->array[child]);
@@ -214,19 +163,15 @@ void heap_offer(heap_t * h, void *item)
 #if DEBUG
 static void DEBUG_check_validity(heap_t * h)
 {
-    int ii;
+    int i;
 
-    for (ii = 0; ii < h->count; ii++)
-	assert(h->array[ii]);
+    for (i = 0; i < h->count; i++)
+	assert(h->array[i]);
 }
 #endif
 
 void *heap_poll(heap_t * h)
 {
-    void *item;
-
-    assert(h);
-
     if (!h)
 	return NULL;
 
@@ -237,7 +182,7 @@ void *heap_poll(heap_t * h)
     DEBUG_check_validity(h);
 #endif
 
-    item = h->array[0];
+    void *item = h->array[0];
 
     h->array[0] = NULL;
     __swap(h, 0, h->count - 1);
@@ -277,17 +222,14 @@ void heap_clear(heap_t * h)
 }
 
 /**
- * @return item's index on the heap's array */
+ * @return item's index on the heap's array; otherwise -1 */
 static int __item_get_idx(heap_t * h, const void *item)
 {
-    int compare, idx;
+    unsigned int idx;
 
     for (idx = 0; idx < h->count; idx++)
     {
-	compare = h->cmp(h->array[idx], item, h->udata);
-
-	/* we have found it */
-	if (compare == 0)
+	if (0 == h->cmp(h->array[idx], item, h->udata))
 	{
 	    return idx;
 	}
@@ -298,22 +240,16 @@ static int __item_get_idx(heap_t * h, const void *item)
 
 void *heap_remove_item(heap_t * h, const void *item)
 {
-    void *ret_item;
-    int idx;
+    int idx = __item_get_idx(h, item);
 
-    /* find the index */
-    idx = __item_get_idx(h, item);
-
-    /* we didn't find it */
     if (idx == -1)
 	return NULL;
 
     /* swap the item we found with the last item on the heap */
-    ret_item = h->array[idx];
+    void *ret_item = h->array[idx];
     h->array[idx] = h->array[h->count - 1];
     h->array[h->count - 1] = NULL;
 
-    /* decrement counter */
     h->count -= 1;
 
     /* ensure heap property */
@@ -324,11 +260,7 @@ void *heap_remove_item(heap_t * h, const void *item)
 
 int heap_contains_item(heap_t * h, const void *item)
 {
-    int idx;
-
-    /* find the index */
-    idx = __item_get_idx(h, item);
-
+    int idx = __item_get_idx(h, item);
     return (idx != -1);
 }
 

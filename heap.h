@@ -3,8 +3,10 @@
 
 typedef struct {
     void **array;
-    int arraySize;
-    int count;
+    /* size of array */
+    unsigned int size;
+    /* items within heap */
+    unsigned int count;
     /**  user data */
     const void *udata;
     int (*cmp) (const void *, const void *, const void *);
