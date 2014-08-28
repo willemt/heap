@@ -7,7 +7,6 @@
 
 #include "heap.h"
 
-#define DEBUG 0
 #define INITIAL_CAPACITY 13
 
 static int __child_left(const int idx)
