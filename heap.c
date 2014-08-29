@@ -162,7 +162,7 @@ void heap_offer(heap_t * h, void *item)
 #if DEBUG
 static void DEBUG_check_validity(heap_t * h)
 {
-    int i;
+    unsigned int i;
 
     for (i = 0; i < h->count; i++)
 	assert(h->array[i]);
