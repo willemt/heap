@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/willemt/heap.png
+   :target: https://travis-ci.org/willemt/heap
+
 What?
 -----
 A heap abstract data type implemented within an array.
