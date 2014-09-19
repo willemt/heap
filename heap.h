@@ -1,16 +1,7 @@
 #ifndef HEAP_H
 #define HEAP_H
 
-typedef struct {
-    void **array;
-    /* size of array */
-    unsigned int size;
-    /* items within heap */
-    unsigned int count;
-    /**  user data */
-    const void *udata;
-    int (*cmp) (const void *, const void *, const void *);
-} heap_t;
+typedef struct heap_s heap_t;
 
 /**
  * Init a heap and return it. Malloc space for it.

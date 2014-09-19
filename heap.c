@@ -7,6 +7,17 @@
 
 #include "heap.h"
 
+struct heap_s {
+    void **array;
+    /* size of array */
+    unsigned int size;
+    /* items within heap */
+    unsigned int count;
+    /**  user data */
+    const void *udata;
+    int (*cmp) (const void *, const void *, const void *);
+};
+
 #define INITIAL_CAPACITY 13
 
 static int __child_left(const int idx)
