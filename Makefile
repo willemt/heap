@@ -12,7 +12,7 @@ main.c:
 test: main.c heap.o tests/test_heap.c tests/CuTest.c main.c
 	$(CC) $(CCFLAGS) -o $@ $^
 	./test
-	gcov main.c tests/test_heap.c heap.c
+	gcov heap.c
 
 heap.o: heap.c
 	$(CC) $(CCFLAGS) -c -o $@ $^
