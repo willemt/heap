@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <string.h>
+#include <assert.h>
 
 #include "heap.h"
 
@@ -20,6 +21,7 @@ static int __child_right(const int idx)
 
 static int __parent(const int idx)
 {
+    assert(idx != 0);
     return (idx - 1) / 2;
 }
 
@@ -85,7 +87,10 @@ static int __ensurecapacity(heap_t * h)
     /* copy old data across to new array */
     unsigned int i;
     for (i = 0; i < h->count; i++)
+    {
         new_array[i] = h->array[i];
+        assert(new_array[i]);
+    }
 
     /* swap arrays */
     free(h->array);
@@ -126,6 +131,8 @@ static void __pushdown(heap_t * h, unsigned int idx)
     {
         unsigned int childl, childr, child;
 
+        assert(idx != h->count);
+
         childl = __child_left(idx);
         childr = __child_right(idx);
 
@@ -146,6 +153,8 @@ static void __pushdown(heap_t * h, unsigned int idx)
         /* idx is smaller than child */
         if (h->cmp(h->array[idx], h->array[child], h->udata) < 0)
         {
+            assert(h->array[idx]);
+            assert(h->array[child]);
             __swap(h, idx, child);
             idx = child;
             /* bigger than the biggest child, we stop, we win */
@@ -166,6 +175,7 @@ static int __heap_offerx(heap_t * h, void *item)
 
 int heap_offerx(heap_t * h, void *item)
 {
+    assert(h);
     if (!item)
         return -1;
     if (h->count == h->size)
@@ -175,6 +185,7 @@ int heap_offerx(heap_t * h, void *item)
 
 int heap_offer(heap_t * h, void *item)
 {
+    assert(h);
     if (!item)
         return -1;
     if (-1 == __ensurecapacity(h))
@@ -187,14 +198,29 @@ void *heap_poll(heap_t * h)
     if (0 == heap_count(h))
         return NULL;
 
+#if DEBUG
+    DEBUG_check_validity(h);
+#endif
+
     void *item = h->array[0];
 
     h->array[0] = NULL;
     __swap(h, 0, h->count - 1);
     h->count--;
 
+#if DEBUG
+    DEBUG_check_validity(h);
+#endif
+
     if (h->count > 0)
+    {
+        assert(h->array[0]);
         __pushdown(h, 0);
+    }
+
+#if DEBUG
+    DEBUG_check_validity(h);
+#endif
 
     return item;
 }
