@@ -2,17 +2,6 @@
 #define HEAP_H
 
 typedef struct heap_s heap_t;
-struct heap_s
-{
-    void **array;
-    /* size of array */
-    unsigned int size;
-    /* items within heap */
-    unsigned int count;
-    /**  user data */
-    const void *udata;
-    int (*cmp) (const void *, const void *, const void *);
-};
 
 /**
  * Create a new heap and initialise it.
@@ -41,7 +30,6 @@ void heap_init(heap_t* h,
                            const void *,
                            const void *udata),
                const void *udata,
-               void **array,
                unsigned int size);
 
 /**
@@ -52,11 +40,11 @@ void heap_free(heap_t * hp);
  * Add item to heap.
  *
  * Ensures that heap can hold item.
- * malloc() possibly called.
+ * realloc() possibly called.
  *
  * @param[in] item Item to be added to the heap
- * @return 0 on success; -1 on error */
-int heap_offer(heap_t * hp, void *item);
+ * @return a pointer to the heap, or NULL on failure */
+heap_t* heap_offer(heap_t * hp, void *item);
 
 /**
  * Add item to heap.
@@ -89,6 +77,10 @@ int heap_count(heap_t * hp);
 /**
  * @return size of array */
 int heap_size(heap_t * hp);
+
+/**
+ * @return number of bytes needed for a heap of this size. */
+size_t heap_sizeof(unsigned int size);
 
 /**
  * Remove item from heap

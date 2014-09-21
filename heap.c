@@ -8,6 +8,23 @@
 
 #define DEFAULT_CAPACITY 13
 
+struct heap_s
+{
+    /* size of array */
+    unsigned int size;
+    /* items within heap */
+    unsigned int count;
+    /**  user data */
+    const void *udata;
+    int (*cmp) (const void *, const void *, const void *);
+    void * array[];
+};
+
+size_t heap_sizeof(unsigned int size)
+{
+    return sizeof(heap_t) + size * sizeof(void *);
+}
+
 static int __child_left(const int idx)
 {
     return idx * 2 + 1;
@@ -28,7 +45,6 @@ void heap_init(heap_t* h,
                            const void *,
                            const void *udata),
                const void *udata,
-               void **array,
                unsigned int size
                )
 {
@@ -36,7 +52,6 @@ void heap_init(heap_t* h,
     h->udata = udata;
     h->size = size;
     h->count = 0;
-    h->array = array;
 }
 
 heap_t *heap_new(int (*cmp) (const void *,
@@ -44,53 +59,31 @@ heap_t *heap_new(int (*cmp) (const void *,
                              const void *udata),
                  const void *udata)
 {
-    heap_t *h = malloc(sizeof(heap_t));
+    heap_t *h = malloc(heap_sizeof(DEFAULT_CAPACITY));
 
     if (!h)
         return NULL;
 
-    void** array = malloc(sizeof(void *) * DEFAULT_CAPACITY);
-
-    if (!array)
-    {
-        free(h);
-        return NULL;
-    }
-
-    heap_init(h, cmp, udata, array, DEFAULT_CAPACITY);
+    heap_init(h, cmp, udata, DEFAULT_CAPACITY);
 
     return h;
 }
 
 void heap_free(heap_t * h)
 {
-    free(h->array);
     free(h);
 }
 
 /**
- * @return 0 on success; -1 otherwise */
-static int __ensurecapacity(heap_t * h)
+ * @return a new heap on success; NULL otherwise */
+static heap_t* __ensurecapacity(heap_t * h)
 {
     if (h->count < h->size)
-        return 0;
+        return h;
 
     h->size *= 2;
 
-    void **new_array = malloc(sizeof(void *) * h->size);
-
-    if (!new_array)
-        return -1;
-
-    /* copy old data across to new array */
-    unsigned int i;
-    for (i = 0; i < h->count; i++)
-        new_array[i] = h->array[i];
-
-    /* swap arrays */
-    free(h->array);
-    h->array = new_array;
-    return 0;
+    return realloc(h, heap_sizeof(h->size));
 }
 
 static void __swap(heap_t * h, const int i1, const int i2)
@@ -166,20 +159,18 @@ static int __heap_offerx(heap_t * h, void *item)
 
 int heap_offerx(heap_t * h, void *item)
 {
-    if (!item)
-        return -1;
     if (h->count == h->size)
         return -1;
     return __heap_offerx(h, item);
 }
 
-int heap_offer(heap_t * h, void *item)
+heap_t* heap_offer(heap_t * h, void *item)
 {
-    if (!item)
-        return -1;
-    if (-1 == __ensurecapacity(h))
-        return -1;
-    return __heap_offerx(h, item);
+    if (NULL == (h = __ensurecapacity(h)))
+        return NULL;
+
+    __heap_offerx(h, item); // always returns 0
+    return h;
 }
 
 void *heap_poll(heap_t * h)
