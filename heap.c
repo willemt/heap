@@ -148,29 +148,29 @@ static void __pushdown(heap_t * h, unsigned int idx)
     }
 }
 
-static int __heap_offerx(heap_t * h, void *item)
+static void __heap_offerx(heap_t * h, void *item)
 {
     h->array[h->count] = item;
 
     /* ensure heap properties */
     __pushup(h, h->count++);
-    return 0;
 }
 
 int heap_offerx(heap_t * h, void *item)
 {
     if (h->count == h->size)
         return -1;
-    return __heap_offerx(h, item);
+    __heap_offerx(h, item);
+    return 0;
 }
 
-heap_t* heap_offer(heap_t * h, void *item)
+int heap_offer(heap_t ** h, void *item)
 {
-    if (NULL == (h = __ensurecapacity(h)))
-        return NULL;
+    if (NULL == (*h = __ensurecapacity(*h)))
+        return -1;
 
-    __heap_offerx(h, item); // always returns 0
-    return h;
+    __heap_offerx(*h, item);
+    return 0;
 }
 
 void *heap_poll(heap_t * h)
