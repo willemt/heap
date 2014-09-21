@@ -40,11 +40,15 @@ void heap_free(heap_t * hp);
  * Add item to heap.
  *
  * Ensures that heap can hold item.
- * realloc() possibly called.
  *
+ * NOTE:
+ *  realloc() possibly called.
+ *  The heap pointer will be changed if the heap needs to be enlarged.
+ *
+ * @param[in/out] hp_ptr Pointer to the heap. Changed when heap is enlarged.
  * @param[in] item Item to be added to the heap
- * @return a pointer to the heap, or NULL on failure */
-heap_t* heap_offer(heap_t * hp, void *item);
+ * @return 0 on success; otherwise -1 on failure */
+int heap_offer(heap_t **hp_ptr, void *item);
 
 /**
  * Add item to heap.
