@@ -62,6 +62,7 @@ int heap_offerx(heap_t * hp, void *item);
 
 /**
  * Remove the top value from this heap.
+ *
  * @return top item of the heap */
 void *heap_poll(heap_t * hp);
 
@@ -71,7 +72,10 @@ void *heap_peek(heap_t * hp);
 
 /**
  * Clear all items from the heap.
- * Does not free items. Only use if item memory is managed outside of heap */
+ *
+ * NOTE:
+ *  Does not free items.
+ *  Only use if item memory is managed outside of heap */
 void heap_clear(heap_t * hp);
 
 /**
@@ -94,8 +98,6 @@ size_t heap_sizeof(unsigned int size);
 void *heap_remove_item(heap_t * hp, const void *item);
 
 /**
- * The heap will remove this item
- *
  * @param[in] item Item to be removed
  * @return 1 if the heap contains this item; 0 otherwise */
 int heap_contains_item(heap_t * hp, const void *item);
