@@ -180,11 +180,10 @@ void *heap_poll(heap_t * h)
 
     void *item = h->array[0];
 
-    h->array[0] = NULL;
-    __swap(h, 0, h->count - 1);
+    h->array[0] = h->array[h->count - 1];
     h->count--;
 
-    if (h->count > 0)
+    if (h->count > 1)
         __pushdown(h, 0);
 
     return item;
