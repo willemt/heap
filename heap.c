@@ -190,7 +190,7 @@ void *heap_poll(heap_t * h)
     return item;
 }
 
-void *heap_peek(heap_t * h)
+void *heap_peek(const heap_t * h)
 {
     if (0 == heap_count(h))
         return NULL;
@@ -205,7 +205,7 @@ void heap_clear(heap_t * h)
 
 /**
  * @return item's index on the heap's array; otherwise -1 */
-static int __item_get_idx(heap_t * h, const void *item)
+static int __item_get_idx(const heap_t * h, const void *item)
 {
     unsigned int idx;
 
@@ -236,17 +236,17 @@ void *heap_remove_item(heap_t * h, const void *item)
     return ret_item;
 }
 
-int heap_contains_item(heap_t * h, const void *item)
+int heap_contains_item(const heap_t * h, const void *item)
 {
     return __item_get_idx(h, item) != -1;
 }
 
-int heap_count(heap_t * h)
+int heap_count(const heap_t * h)
 {
     return h->count;
 }
 
-int heap_size(heap_t * h)
+int heap_size(const heap_t * h)
 {
     return h->size;
 }
